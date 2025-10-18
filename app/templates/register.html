@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro - AppSecurity</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+    <main class="container">
+        <section class="card">
+            <header class="card__header">
+                <h1>Crie sua conta</h1>
+                <p>Preencha os dados abaixo para ter acesso ao aplicativo móvel.</p>
+            </header>
+
+            <form class="form" method="post" novalidate>
+                <div class="form__group">
+                    <label for="full_name">Nome Completo</label>
+                    <input id="full_name" name="full_name" type="text" placeholder="Maria da Silva" required />
+                </div>
+
+                <div class="form__group">
+                    <label for="cpf">CPF</label>
+                    <input id="cpf" name="cpf" type="text" inputmode="numeric" maxlength="11" placeholder="00000000000" required />
+                    <small class="form__hint">Digite apenas números.</small>
+                </div>
+
+                <fieldset class="form__fieldset">
+                    <legend>Endereço</legend>
+                    <div class="form__grid">
+                        <div class="form__group">
+                            <label for="street">Logradouro</label>
+                            <input id="street" name="street" type="text" placeholder="Rua Exemplo" required />
+                        </div>
+                        <div class="form__group form__group--sm">
+                            <label for="number">Número</label>
+                            <input id="number" name="number" type="text" placeholder="123" required />
+                        </div>
+                        <div class="form__group">
+                            <label for="complement">Complemento</label>
+                            <input id="complement" name="complement" type="text" placeholder="Apto 45" />
+                        </div>
+                        <div class="form__group">
+                            <label for="district">Bairro</label>
+                            <input id="district" name="district" type="text" placeholder="Centro" required />
+                        </div>
+                        <div class="form__group">
+                            <label for="city">Cidade</label>
+                            <input id="city" name="city" type="text" placeholder="São Paulo" required />
+                        </div>
+                        <div class="form__group form__group--xs">
+                            <label for="state">Estado</label>
+                            <input id="state" name="state" type="text" maxlength="2" placeholder="SP" required />
+                        </div>
+                        <div class="form__group form__group--sm">
+                            <label for="postal_code">CEP</label>
+                            <input id="postal_code" name="postal_code" type="text" inputmode="numeric" placeholder="00000-000" required />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button class="button" type="submit">Cadastrar</button>
+            </form>
+
+            {% if submitted and form_data %}
+            <section class="summary" aria-live="polite">
+                <h2>Resumo do cadastro</h2>
+                <ul>
+                    <li><strong>Nome:</strong> {{ form_data.full_name }}</li>
+                    <li><strong>CPF:</strong> {{ form_data.cpf }}</li>
+                    <li><strong>Endereço:</strong> {{ form_data.street }}, {{ form_data.number }}{% if form_data.complement %} - {{ form_data.complement }}{% endif %}, {{ form_data.district }}, {{ form_data.city }} - {{ form_data.state }}, {{ form_data.postal_code }}</li>
+                </ul>
+            </section>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

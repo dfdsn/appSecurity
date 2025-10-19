@@ -1,4 +1,5 @@
 from typing import Annotated, Dict
+from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
@@ -6,13 +7,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, constr
 
+# --- App & paths (robusto ao CWD do VS Code) ---
+BASE_DIR = Path(__file__).resolve().parents[1]  # sobe de .../app/main.py para a raiz (appSecurity)
 app = FastAPI(title="AppSecurity - Cadastro")
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "app" / "static")), name="static")
+templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
-
+# --- Tipagens/validações ---
 CPF = constr(pattern=r"^\d{11}$", strip_whitespace=True)
-
 
 class RegistrationData(BaseModel):
     full_name: str = Field(..., title="Nome Completo", min_length=3)
@@ -25,31 +27,26 @@ class RegistrationData(BaseModel):
     state: str = Field(..., title="Estado")
     postal_code: constr(pattern=r"^\d{5}-?\d{3}$", strip_whitespace=True) = Field(..., title="CEP")
 
-
+# --- Rotas ---
 @app.get("/", response_class=HTMLResponse)
 async def show_registration_form(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         "register.html",
-        {
-            "request": request,
-            "submitted": False,
-            "form_data": None,
-        },
+        {"request": request, "submitted": False, "form_data": None},
     )
-
 
 @app.post("/", response_class=HTMLResponse)
 async def submit_registration_form(
     request: Request,
-    full_name: Annotated[str, Form(...)],
-    cpf: Annotated[str, Form(...)],
-    street: Annotated[str, Form(...)],
-    number: Annotated[str, Form(...)],
-    complement: Annotated[str, Form("")],
-    district: Annotated[str, Form(...)],
-    city: Annotated[str, Form(...)],
-    state: Annotated[str, Form(...)],
-    postal_code: Annotated[str, Form(...)],
+    full_name: Annotated[str, Form()],
+    cpf: Annotated[str, Form()],
+    street: Annotated[str, Form()],
+    number: Annotated[str, Form()],
+    district: Annotated[str, Form()],
+    city: Annotated[str, Form()],
+    state: Annotated[str, Form()],
+    postal_code: Annotated[str, Form()],
+    complement: Annotated[str, Form()] = "",  # <- parâmetros com default por último
 ) -> HTMLResponse:
     data = RegistrationData(
         full_name=full_name,
@@ -68,12 +65,7 @@ async def submit_registration_form(
 
     return templates.TemplateResponse(
         "register.html",
-        {
-            "request": request,
-            "submitted": True,
-            "form_data": masked_data,
-        },
+        {"request": request, "submitted": True, "form_data": masked_data},
     )
-
 
 __all__ = ["app"]
